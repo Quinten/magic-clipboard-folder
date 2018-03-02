@@ -18,5 +18,8 @@
   "bugs": {
     "url": "https://github.com/Quinten/magic-clipboard-folder/issues"
   },
-  "homepage": "https://github.com/Quinten/magic-clipboard-folder#readme"
+  "homepage": "https://github.com/Quinten/magic-clipboard-folder#readme",
+  "dependencies": {
+    "@google-cloud/vision": "^0.15.2"
+  }
 }
