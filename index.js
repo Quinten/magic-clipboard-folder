@@ -3,25 +3,36 @@
 console.log('Magic clipboard is watching your folder!');
 
 const vision = require('@google-cloud/vision');
-
-// Creates a client
 const client = new vision.ImageAnnotatorClient();
 
-/**
-  * TODO(developer): Uncomment the following line before running the sample.
-  */
-const fileName = 'test.png';
+let lastFile;
 
-// Performs text detection on the local file
-client.textDetection(fileName)
-    .then(results => {
-        const detections = results[0].textAnnotations;
-        console.log('Text:');
-        //detections.forEach(text => console.log(text));
-        if (detections[0]) {
-            console.log(detections[0].description);
+const watch = require('watch');
+watch.watchTree('.', function (f, curr, prev) {
+    if (typeof f == "object" && prev === null && curr === null) {
+        // Finished walking the tree
+        //console.log('tree');
+    } else if (prev === null) {
+        // f is a new file
+        if (lastFile != f && f.indexOf('png') > -1) {
+            console.log(f + ' was added!');
+            lastFile = f;
+            client.textDetection(f)
+                .then(results => {
+                    const detections = results[0].textAnnotations;
+                    console.log('Text:');
+                    //detections.forEach(text => console.log(text));
+                    if (detections[0]) {
+                        console.log(detections[0].description);
+                    }
+                })
+                .catch(err => {
+                    console.error('ERROR:', err);
+                });
         }
-    })
-    .catch(err => {
-        console.error('ERROR:', err);
-    });
+    } else if (curr.nlink === 0) {
+        // f was removed
+    } else {
+        // f was changed
+    }
+});
