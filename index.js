@@ -2,6 +2,8 @@
 
 console.log('Magic clipboard is watching your folder!');
 
+let ncp = require("copy-paste");
+
 const vision = require('@google-cloud/vision');
 const client = new vision.ImageAnnotatorClient();
 
@@ -20,10 +22,14 @@ watch.watchTree('.', function (f, curr, prev) {
             client.textDetection(f)
                 .then(results => {
                     const detections = results[0].textAnnotations;
-                    console.log('Text:');
                     //detections.forEach(text => console.log(text));
                     if (detections[0]) {
-                        console.log(detections[0].description);
+                        let newText = detections[0].description;
+                        newText = newText.trim();
+                        console.log('Text: ' + newText);
+                        ncp.copy(newText, function () {
+                            console.log('Copied to clipboard!');
+                        });
                     }
                 })
                 .catch(err => {
